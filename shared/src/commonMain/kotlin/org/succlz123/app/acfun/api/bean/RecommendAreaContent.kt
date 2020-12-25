@@ -1,0 +1,46 @@
+package org.succlz123.app.acfun.api.bean
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class RecommendAreaContent(
+        val adBlock: Int = 0,
+        val adHeight: Int = 0,
+        val adId: Int = 0,
+        val adPage: Int = 0,
+        val adRank: Int = 0,
+        val adTag: Int = 0,
+        val adWidth: Int = 0,
+        val bananaNum: Int = 0,
+        val comments: Int = 0,
+        val contentUpdateAt: Long,
+        val creatorId: Int = 0,
+        val danmakuSize: Int = 0,
+        val id: Int = 0,
+        val image: String? = null,
+        val isCrown: Int = 0,
+        val isDeleted: Int = 0,
+        val link: String? = null,
+        val mediaId: Int = 0,
+        val mediaType: Int = 0,
+        val moduleId: Int = 0,
+        val positionType: Int = 0,
+        val smallImage: String? = null,
+        val sortTime: String? = null,
+        val stows: Int = 0,
+        val subTitle: String? = null,
+        val time: String? = null,
+        val timeBefore: String? = null,
+        val timeUpdateFormat: String? = null,
+        val title: String? = null,
+        val updaterId: Int = 0,
+        val userId: Int = 0,
+        val userName: String? = null,
+        val userUrl: String? = null,
+        val verified: Int = 0,
+        val verifiedText: String? = null,
+        val videoId: Int = 0,
+        val videoTimeFormat: String? = null,
+        val views: Int = 0,
+        val viewsFormat: String? = null
+)
