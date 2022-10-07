@@ -8,7 +8,11 @@ import java.util.*
 
 @Composable
 actual fun initComposeMultiplatform() {
-    ImageLoader.configuration(rootDirectory = getCacheFolder("AcFun"))
+    ImageLoader.configuration(
+        rootDirectory = getCacheFolder("AcFun"),
+        maxMemoryCacheSize = 150 * 1024 * 1024,
+        maxDiskCacheSize = 300 * 1024 * 1024
+    )
     FileDownLoader.configuration(rootDirectory = getCacheFolder("AcFun"))
 }
 

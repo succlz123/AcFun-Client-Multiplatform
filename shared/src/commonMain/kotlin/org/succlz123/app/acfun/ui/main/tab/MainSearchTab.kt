@@ -51,12 +51,8 @@ fun MainSearchTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
             }
         }
     }) {
-        MainHomeContentItem(
-            result = searchVm.search.value,
-            rememberSelectedItem = null,
-            isExpandedScreen = isExpandedScreen,
-            onRefresh = {
-                searchVm.search()
-            }) { searchVm.loadMore() }
+        MainHomeContentItem(result = searchVm.search.value, isExpandedScreen = isExpandedScreen, onRefresh = {
+            searchVm.search()
+        }) { searchVm.loadMore() }
     }
 }

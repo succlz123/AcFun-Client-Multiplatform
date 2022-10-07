@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             ScreenContainer(this, this, this, this) {
-                SharedMainContent()
+                SharedApp()
             }
         }
     }

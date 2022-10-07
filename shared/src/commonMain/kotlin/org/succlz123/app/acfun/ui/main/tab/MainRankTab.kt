@@ -51,7 +51,6 @@ fun MainRankTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
         }
         MainHomeContentItem(
             result = rankVm.rank.value,
-            rememberSelectedItem = null,
             isExpandedScreen = isExpandedScreen,
             onRefresh = {
                 rankVm.getRankData(ArrayList(rankVm.rankOption.keys.toList())[optionalState.value], isForce = true)

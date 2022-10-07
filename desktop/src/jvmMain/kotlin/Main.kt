@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import org.succlz123.app.acfun.SharedMainContent
+import org.succlz123.app.acfun.SharedApp
 import org.succlz123.lib.init.initComposeMultiplatform
 import org.succlz123.lib.screen.ScreenContainer
 import java.awt.Dimension
@@ -40,7 +40,7 @@ fun main() = application {
             rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
             rootPane.putClientProperty("apple.awt.windowTitleVisible", false)
         }
-        SharedMainContent()
+        SharedApp()
         AppWindowTitleBar(windowState)
     }
 }

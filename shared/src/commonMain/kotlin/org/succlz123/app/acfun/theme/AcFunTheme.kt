@@ -4,12 +4,18 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.succlz123.lib.screen.LocalScreenWindowSizeOwner
+import org.succlz123.lib.screen.window.ScreenWindowSizeClass
 
 private val DarkColorPalette = darkColors(
     primary = ColorResource.acRed, secondary = Color.LightGray
@@ -18,6 +24,8 @@ private val DarkColorPalette = darkColors(
 private val LightColorPalette = lightColors(
     primary = ColorResource.acRed, secondary = Color.Black
 )
+
+val LocalAppDimens = staticCompositionLocalOf { expandedDimens }
 
 @Composable
 fun AcFunTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
@@ -57,7 +65,35 @@ fun AcFunTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable(
     val shapes = Shapes(
         small = RoundedCornerShape(8.dp), medium = RoundedCornerShape(12.dp), large = RoundedCornerShape(16.dp)
     )
-    MaterialTheme(
-        colors = colors, typography = typography, shapes = shapes, content = content
-    )
+    val sizeClass = LocalScreenWindowSizeOwner.current.getWindowHolder().sizeClass.collectAsState()
+    val dimens = when (sizeClass.value) {
+        ScreenWindowSizeClass.Compact -> {
+            compactDimens
+        }
+
+        ScreenWindowSizeClass.Medium -> {
+            compactDimens
+        }
+
+        ScreenWindowSizeClass.Expanded -> expandedDimens
+    }
+    CompositionLocalProvider(
+        LocalAppDimens provides dimens
+    ) {
+        MaterialTheme(
+            colors = colors, typography = typography, shapes = shapes, content = content
+        )
+    }
 }
+
+class AppDimens(
+    val listContentPadding: Dp
+)
+
+val compactDimens = AppDimens(
+    listContentPadding = 12.dp,
+)
+
+val expandedDimens = AppDimens(
+    listContentPadding = 16.dp,
+)

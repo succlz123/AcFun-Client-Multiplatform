@@ -2,7 +2,6 @@ package org.succlz123.app.acfun.ui.main.vm
 
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import org.succlz123.lib.network.HttpX
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -13,6 +12,7 @@ import org.succlz123.app.acfun.api.bean.AcContent
 import org.succlz123.app.acfun.api.bean.HomeRecommendItem
 import org.succlz123.app.acfun.api.bean.RecommendHomePageletList
 import org.succlz123.app.acfun.category.CategoryManager
+import org.succlz123.lib.network.HttpX
 import org.succlz123.lib.screen.result.ScreenResult
 import org.succlz123.lib.vm.BaseViewModel
 
@@ -34,7 +34,7 @@ class HomeAreaViewModel : BaseViewModel() {
         }
     }
 
-    fun getHomeData(isForce: Boolean = false) {
+    private fun getHomeData(isForce: Boolean = false) {
         if (recommendMap[-1] is ScreenResult.Loading) {
             return
         }

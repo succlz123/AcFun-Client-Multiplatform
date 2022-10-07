@@ -25,18 +25,19 @@ import org.succlz123.lib.screen.viewmodel.viewModel
 @Composable
 fun MainSettingTab(modifier: Modifier = Modifier) {
     val viewModel = viewModel { HomeSettingViewModel() }
-    val scrollState = rememberScrollState()
-    MainRightTitleLayout(modifier.verticalScroll(scrollState), text = "设置") {
-        val r = Runtime.getRuntime()
+    MainRightTitleLayout(modifier.verticalScroll(rememberScrollState()), text = "设置") {
+        val r = remember { Runtime.getRuntime() }
         val props = remember { System.getProperties() }
         val map = remember { System.getenv() }
         Column(modifier = Modifier.padding(26.dp, 26.dp, 26.dp, 26.dp).fillMaxSize()) {
-            Text(
-                text = "播放设置", style = MaterialTheme.typography.h3
-            )
+            Text(text = "播放设置", style = MaterialTheme.typography.h3)
             Spacer(modifier = Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "简易弹幕开关（试验功能）:", style = MaterialTheme.typography.h5, fontWeight = FontWeight.Normal)
+                Text(
+                    text = "简易弹幕开关（试验功能）:",
+                    style = MaterialTheme.typography.h5,
+                    fontWeight = FontWeight.Normal
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 HomeSettingViewModel.danmakuList.forEachIndexed { index, s ->
                     Text(

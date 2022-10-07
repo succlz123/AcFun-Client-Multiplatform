@@ -19,7 +19,6 @@ fun MainLiveTab(modifier: Modifier, isExpandedScreen: Boolean) {
     MainRightTitleLayout(modifier, text = "直播") {
         MainHomeContentItem(
             result = liveVm.homeLiveRoomList.value,
-            rememberSelectedItem = null,
             isExpandedScreen = isExpandedScreen,
             onRefresh = {
                 liveVm.refreshLiveRoomData()

@@ -33,13 +33,13 @@ object Manifest {
 }
 
 @Composable
-fun SharedMainContent() {
+fun SharedApp() {
     val screenNavigator = rememberScreenNavigator()
     AcFunTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             ScreenHost(screenNavigator = screenNavigator, rootScreenName = Manifest.MainScreen) {
                 groupScreen(screenName = (Manifest.MainScreen)) {
-                    MainScreen()
+                    MainScreen(modifier = Modifier.fillMaxSize())
                 }
                 groupScreen(screenName = (Manifest.VideoDetailScreen)) {
                     VideoDetailScreen()

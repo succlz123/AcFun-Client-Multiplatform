@@ -136,8 +136,7 @@ fun AreaContentScreen() {
 
                     LaunchedEffect(Unit) {
                         viewModel.getData(
-                            id,
-                            ArrayList(AreaContentViewModel.MAP.keys.toList())[viewModel.rankSelectIndex.value]
+                            id, ArrayList(AreaContentViewModel.MAP.keys.toList())[viewModel.rankSelectIndex.value]
                         )
                         snapshotFlow { viewModel.rankSelectIndex.value }.distinctUntilChanged().collect {
                             viewModel.getData(
@@ -151,9 +150,7 @@ fun AreaContentScreen() {
                         LoadingView()
                     } else {
                         val content = ArrayList(acContentList)
-                        MainHomeContentItem(
-                            result = ScreenResult.Success(content),
-                            rememberSelectedItem = null,
+                        MainHomeContentItem(result = ScreenResult.Success(content),
                             isExpandedScreen = isExpandedScreen,
                             onRefresh = {
                                 viewModel.getData(

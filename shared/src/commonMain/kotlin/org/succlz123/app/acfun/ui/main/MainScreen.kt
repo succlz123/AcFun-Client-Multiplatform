@@ -23,14 +23,14 @@ import org.succlz123.lib.screen.viewmodel.viewModel
 import org.succlz123.lib.window.rememberIsWindowExpanded
 
 @Composable
-fun MainScreen() {
+fun MainScreen(modifier: Modifier) {
     val isExpandedScreen = rememberIsWindowExpanded()
     val homeVm = viewModel(MainViewModel::class) {
         MainViewModel()
     }
     if (isExpandedScreen) {
         Row(
-            modifier = Modifier.fillMaxSize().background(Color.White), verticalAlignment = Alignment.CenterVertically
+            modifier = modifier.background(Color.White), verticalAlignment = Alignment.CenterVertically
         ) {
             MainLeft(Modifier.fillMaxHeight().background(ColorResource.background), isExpandedScreen, homeVm)
             Column {
@@ -42,7 +42,9 @@ fun MainScreen() {
                         url = "ic_acfun_title.png", modifier = Modifier.width(83.dp).height(25.dp)
                     )
                 }
-                val rightModifier = Modifier.fillMaxHeight().weight(1f)
+                val rightModifier = remember {
+                    Modifier.fillMaxHeight().weight(1f)
+                }
                 when (homeVm.leftSelectItem.value) {
                     0 -> {
                         MainHomeTab(modifier = rightModifier, isExpandedScreen)
@@ -75,7 +77,7 @@ fun MainScreen() {
             }
         }
     } else {
-        Column(modifier = Modifier.background(ColorResource.background)) {
+        Column(modifier = modifier.background(ColorResource.background)) {
             Box(
                 modifier = Modifier.fillMaxWidth().padding(0.dp, 18.dp, 0.dp, 8.dp), contentAlignment = Alignment.Center
             ) {

@@ -114,7 +114,6 @@ fun UserSpaceScreen() {
                     } else {
                         val content = ArrayList(acContentList)
                         MainHomeContentItem(result = ScreenResult.Success(content),
-                            rememberSelectedItem = null,
                             isExpandedScreen = isExpandedScreen,
                             onRefresh = {
                                 viewModel.loadMoreUpSpace(id, true)
