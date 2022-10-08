@@ -29,11 +29,11 @@ fun LoadingView() {
 
 @Composable
 fun AcRefreshButton(modifier: Modifier, onClick: () -> Unit) {
-    Card(modifier = modifier, backgroundColor = Color.White, elevation = 32.dp) {
+    Card(modifier = modifier, backgroundColor = Color.White, elevation = 12.dp) {
         Box(modifier = Modifier.padding(12.dp).noRippleClickable(onClick)) {
             Icon(
                 Icons.Sharp.Refresh,
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(36.dp).padding(2.dp),
                 contentDescription = "Refresh",
                 tint = ColorResource.acRed
             )
@@ -43,11 +43,11 @@ fun AcRefreshButton(modifier: Modifier, onClick: () -> Unit) {
 
 @Composable
 fun AcGo2TopButton(modifier: Modifier, onClick: () -> Unit) {
-    Card(modifier = modifier, backgroundColor = Color.White, elevation = 32.dp) {
+    Card(modifier = modifier, backgroundColor = Color.White, elevation = 12.dp) {
         Box(modifier = Modifier.padding(12.dp).noRippleClickable(onClick)) {
             Icon(
                 Icons.Sharp.KeyboardArrowUp,
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(36.dp).padding(2.dp),
                 contentDescription = "Go to top",
                 tint = ColorResource.acRed
             )

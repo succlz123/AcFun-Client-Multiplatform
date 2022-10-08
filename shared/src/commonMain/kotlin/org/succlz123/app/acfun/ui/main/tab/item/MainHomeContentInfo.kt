@@ -1,7 +1,6 @@
 package org.succlz123.app.acfun.ui.main.tab.item
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -25,8 +24,9 @@ import org.succlz123.lib.screen.ScreenArgs
 fun MainHomeContentInfo(item: HomeRecommendItem) {
     val screenNavigator = LocalScreenNavigator.current
     Box(
-        modifier = Modifier.background(Color.White).clip(MaterialTheme.shapes.medium)
-            .border(1.dp, ColorResource.border, MaterialTheme.shapes.medium).fillMaxWidth()
+        modifier = Modifier.clip(MaterialTheme.shapes.medium)
+            .background(ColorResource.background)
+            .fillMaxWidth()
     ) {
         Column(modifier = Modifier.noRippleClickable {
             if (item.item?.type == AcContent.TYPE_LIVE) {

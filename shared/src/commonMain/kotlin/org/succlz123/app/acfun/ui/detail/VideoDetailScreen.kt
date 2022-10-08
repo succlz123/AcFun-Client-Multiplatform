@@ -17,9 +17,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,7 +26,7 @@ import org.succlz123.app.acfun.Manifest
 import org.succlz123.app.acfun.api.bean.AcContent
 import org.succlz123.app.acfun.api.bean.VideoContent
 import org.succlz123.app.acfun.base.AcBackButton
-import org.succlz123.app.acfun.base.AcOutlineButton
+import org.succlz123.app.acfun.base.AcDivider
 import org.succlz123.app.acfun.base.LoadingView
 import org.succlz123.app.acfun.theme.ColorResource
 import org.succlz123.lib.click.noRippleClickable
@@ -39,6 +38,7 @@ import org.succlz123.lib.image.AsyncImageUrlMultiPlatform
 import org.succlz123.lib.screen.LocalScreenNavigator
 import org.succlz123.lib.screen.LocalScreenRecord
 import org.succlz123.lib.screen.ScreenArgs
+import org.succlz123.lib.screen.ext.popupwindow.PopupWindowLayout
 import org.succlz123.lib.screen.operation.PushOptions
 import org.succlz123.lib.screen.result.ScreenResult
 import org.succlz123.lib.screen.value
@@ -60,14 +60,10 @@ fun VideoDetailScreen() {
     LaunchedEffect(Unit) {
         viewModel.getDetail(acContent)
     }
-    Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        Box(modifier = Modifier.fillMaxSize().alpha(0.1f)) {
-            AsyncImageUrlMultiPlatform(
-                modifier = Modifier.fillMaxSize(), url = acContent.img.orEmpty(), contentScale = ContentScale.Crop
-            )
-        }
+    Box(modifier = Modifier.fillMaxSize().background(Color.White).noRippleClickable {
+        screenNavigation.cancelPopupWindow()
+    }) {
         val videoContent = viewModel.videoContentState.value
-
         when (videoContent) {
             is ScreenResult.Uninitialized, is ScreenResult.Loading -> {
                 LoadingView()
@@ -189,17 +185,19 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                 }, text = vContent.user?.name.orEmpty(), fontSize = 20.sp, color = ColorResource.acRed
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = "发布于: " + vContent.createTime.orEmpty(),
-                style = MaterialTheme.typography.body2,
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "关注数: " + vContent.user?.fanCount.orEmpty(),
-                style = MaterialTheme.typography.body2,
-                fontSize = 12.sp
-            )
+            Column {
+                Text(
+                    text = "发布于: " + vContent.createTime.orEmpty(),
+                    style = MaterialTheme.typography.body2,
+                    fontSize = 12.sp
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "关注数: " + vContent.user?.fanCount.orEmpty(),
+                    style = MaterialTheme.typography.body2,
+                    fontSize = 12.sp
+                )
+            }
         }
         Spacer(modifier = Modifier.fillMaxWidth().height(16.dp))
         if (!vContent.description.isNullOrEmpty()) {
@@ -257,42 +255,71 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
         LazyVerticalGrid(
             columns = GridCells.Fixed(
                 if (isExpandedScreen) {
-                    8
+                    6
                 } else {
-                    3
+                    2
                 }
-            ), modifier = Modifier.fillMaxSize()
+            ),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(top = 12.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             itemsIndexed(vContent.videoList.orEmpty()) { index, item ->
-                val modifier = if (index % 10 == 0) {
-                    Modifier.padding(0.dp, 0.dp, 6.dp, 12.dp)
-                } else if ((index + 1) % 12 == 0) {
-                    Modifier.padding(6.dp, 0.dp, 0.dp, 12.dp)
-                } else {
-                    Modifier.padding(6.dp, 0.dp, 6.dp, 12.dp)
-                }
-                Row(
-                    modifier = modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                Box(
+                    modifier = Modifier.weight(1f).height(52.dp).clip(MaterialTheme.shapes.medium)
+                        .background(ColorResource.background)
                 ) {
-                    AcOutlineButton(modifier = Modifier, onClick = {
+                    Box(modifier = Modifier.align(Alignment.Center).fillMaxWidth().noRippleClickable {
                         viewModel.play(acContent, index + 1)
-                    }, content = {
-                        AsyncImageUrlMultiPlatform(url = "ic_download.png",
-                            modifier = Modifier.width(20.dp).height(20.dp).noRippleClickable {
-                                if (getPlatformName() == "Android") {
-                                    screenNavigation.toast("Android 还未适配下载...")
-                                    return@noRippleClickable
+                    }, contentAlignment = Alignment.Center) {
+                        Text(text = (index + 1).toString(), style = MaterialTheme.typography.h3)
+                    }
+                    PopupWindowLayout(modifier = Modifier.align(Alignment.CenterEnd),
+                        displayContent = {
+                            Card(
+                                modifier = Modifier.padding(12.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                elevation = 3.dp,
+                                backgroundColor = Color.White
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(24.dp),
+                                    verticalArrangement = Arrangement.Center,
+                                ) {
+                                    OptionItem(modifier = Modifier.noRippleClickable {
+                                        if (getPlatformName() == "Android") {
+                                            screenNavigation.toast("Android 还未适配下载...")
+                                            screenNavigation.cancelPopupWindow()
+                                            return@noRippleClickable
+                                        }
+                                        viewModel.download(acContent, index + 1)
+                                        screenNavigation.cancelPopupWindow()
+                                    }, "下载视频")
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    AcDivider()
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    OptionItem(modifier = Modifier.noRippleClickable {
+                                        screenNavigation.toast("开发中...")
+                                        screenNavigation.cancelPopupWindow()
+                                    }, "无线投屏")
                                 }
-                                viewModel.download(acContent, index + 1)
-                            })
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(text = (index + 1).toString(), fontSize = 16.sp)
-                    })
+                            }
+                        },
+                        clickableContent = {
+                            AsyncImageUrlMultiPlatform(
+                                url = "ic_show_more.png",
+                                modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp).width(20.dp).height(20.dp)
+                            )
+                        })
                 }
             }
         }
     }
 }
 
+
+@Composable
+fun OptionItem(modifier: Modifier, title: String) {
+    Text(modifier = modifier, text = title, fontSize = 16.sp, color = Color.Black)
+}

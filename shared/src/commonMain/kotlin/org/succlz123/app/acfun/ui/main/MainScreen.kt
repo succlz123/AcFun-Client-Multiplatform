@@ -144,11 +144,10 @@ fun LazyListScope.mainLeft(mainVm: MainViewModel, leftSelectItem: MutableState<I
         Card(
             modifier = Modifier.noRippleClickable {
                 leftSelectItem.value = index
-            }, shape = RoundedCornerShape(8.dp), elevation = if (index == leftSelectItem.value) {
-                3.dp
-            } else {
-                0.dp
-            }, backgroundColor = if (index == leftSelectItem.value) {
+            },
+            shape = RoundedCornerShape(8.dp),
+            elevation = 0.dp,
+            backgroundColor = if (index == leftSelectItem.value) {
                 ColorResource.acRed
             } else {
                 Color.Transparent
