@@ -28,6 +28,7 @@ kotlin {
                 api(compose.material)
 
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                api("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
 
                 api("io.ktor:ktor-client-core:2.1.1")
 //                api("io.ktor:ktor-client-cio:2.1.1")

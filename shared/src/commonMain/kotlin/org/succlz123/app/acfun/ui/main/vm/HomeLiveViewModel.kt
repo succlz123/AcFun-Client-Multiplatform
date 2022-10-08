@@ -1,7 +1,9 @@
 package org.succlz123.app.acfun.ui.main.vm
 
-import androidx.compose.runtime.mutableStateOf
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.succlz123.app.acfun.api.AcfunApiService
 import org.succlz123.app.acfun.api.bean.HomeRecommendItem
@@ -11,7 +13,8 @@ import org.succlz123.lib.screen.result.ScreenResult
 
 class HomeLiveViewModel : ScreenPageViewModel() {
 
-    val homeLiveRoomList = mutableStateOf<ScreenResult<ArrayList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
+    val homeLiveRoomList =
+        MutableStateFlow<ScreenResult<ImmutableList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
 
     fun getLiveRoomData() {
         if (homeLiveRoomList.value !is ScreenResult.Success) {
@@ -40,9 +43,9 @@ class HomeLiveViewModel : ScreenPageViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = AcfunApiService.getLiveRoomListFromNetwork(page, pageSize)
-                val cur = homeLiveRoomList.value.invoke()
+                val cur = ArrayList(homeLiveRoomList.value.invoke().orEmpty())
                 if (response.isNullOrEmpty()) {
-                    if (cur.isNullOrEmpty()) {
+                    if (cur.isEmpty()) {
                         homeLiveRoomList.value = screenResultDataNone()
                     } else {
                         hasMore = false
@@ -51,8 +54,8 @@ class HomeLiveViewModel : ScreenPageViewModel() {
                     if (response.size < 20) {
                         hasMore = false
                     }
-                    cur?.addAll(response)
-                    homeLiveRoomList.value = ScreenResult.Success(cur ?: response)
+                    cur.addAll(response)
+                    homeLiveRoomList.value = ScreenResult.Success(cur.toImmutableList())
                     page++
                 }
             } catch (e: Exception) {

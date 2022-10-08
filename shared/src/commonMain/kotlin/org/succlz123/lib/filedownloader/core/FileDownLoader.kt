@@ -204,7 +204,7 @@ class FileDownLoader(rootDirectory: File) {
         downloadState.downloadJob?.cancel()
         downloadState.downloadJob = null
         cacheDir.listFiles()?.filter {
-            it.name.contains(hashKey(downloadState.request.url.orEmpty()))
+            it.name.contains(downloadState.request.key())
         }?.forEach {
             it.delete()
         }

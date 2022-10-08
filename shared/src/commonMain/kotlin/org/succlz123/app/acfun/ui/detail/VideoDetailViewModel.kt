@@ -1,8 +1,8 @@
 package org.succlz123.app.acfun.ui.detail
 
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.jsoup.nodes.Element
@@ -19,7 +19,7 @@ import org.succlz123.lib.screen.viewmodel.ScreenViewModel
 
 class VideoDetailViewModel : ScreenViewModel() {
 
-    val videoContentState = mutableStateOf<ScreenResult<VideoContent>>(ScreenResult.Uninitialized)
+    val videoContentState = MutableStateFlow<ScreenResult<VideoContent>>(ScreenResult.Uninitialized)
 
     var playVideoContentLoadingState: Boolean = false
 

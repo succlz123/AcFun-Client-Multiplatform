@@ -8,7 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -26,7 +26,7 @@ fun MainSearchTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
     val searchVm = viewModel {
         HomeSearchViewModel()
     }
-    val inputText = remember { searchVm.searchText }
+    val inputText = searchVm.searchText.collectAsState()
     MainRightTitleLayout(modifier, text = "搜索", topRightContent = {
         Row {
             BasicTextField(
@@ -34,7 +34,7 @@ fun MainSearchTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
                 textStyle = TextStyle(fontSize = 16.sp),
                 maxLines = 1,
                 value = inputText.value,
-                onValueChange = { inputText.value = it },
+                onValueChange = { searchVm.searchText.value = it },
             )
             Spacer(modifier = Modifier.width(18.dp))
             Card(backgroundColor = Color.White, elevation = 6.dp) {
@@ -51,8 +51,11 @@ fun MainSearchTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
             }
         }
     }) {
-        MainHomeContentItem(result = searchVm.search.value, isExpandedScreen = isExpandedScreen, onRefresh = {
-            searchVm.search()
-        }) { searchVm.loadMore() }
+        MainHomeContentItem(
+            result = searchVm.search.collectAsState().value,
+            isExpandedScreen = isExpandedScreen,
+            onRefresh = {
+                searchVm.search()
+            }) { searchVm.loadMore() }
     }
 }

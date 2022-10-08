@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ fun MainSettingTab(modifier: Modifier = Modifier) {
             Text(text = "播放设置", style = MaterialTheme.typography.h3)
             Spacer(modifier = Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val danmakuEnableState = viewModel.danmakuEnable.collectAsState()
                 Text(
                     text = "简易弹幕开关（试验功能）:",
                     style = MaterialTheme.typography.h5,
@@ -52,7 +54,7 @@ fun MainSettingTab(modifier: Modifier = Modifier) {
                         },
                         text = s,
                         style = MaterialTheme.typography.body1,
-                        color = if (index == 0 && viewModel.danmakuEnable.value || index == 1 && !viewModel.danmakuEnable.value
+                        color = if (index == 0 && danmakuEnableState.value || index == 1 && !danmakuEnableState.value
                         ) {
                             ColorResource.acRed
                         } else {
@@ -62,6 +64,7 @@ fun MainSettingTab(modifier: Modifier = Modifier) {
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
+            val videoSpeedState = viewModel.videoSpeed.collectAsState()
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "默认播放速度:", style = MaterialTheme.typography.h5, fontWeight = FontWeight.Normal)
                 Spacer(modifier = Modifier.width(12.dp))
@@ -78,7 +81,7 @@ fun MainSettingTab(modifier: Modifier = Modifier) {
                         },
                         text = s,
                         style = MaterialTheme.typography.body1,
-                        color = if (s == viewModel.videoSpeed.value) {
+                        color = if (s == videoSpeedState.value) {
                             ColorResource.acRed
                         } else {
                             ColorResource.subText

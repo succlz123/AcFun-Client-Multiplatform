@@ -1,8 +1,10 @@
 package org.succlz123.app.acfun.ui.main.vm
 
-import androidx.compose.runtime.mutableStateOf
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.succlz123.app.acfun.api.AcfunApiService
 import org.succlz123.app.acfun.api.bean.AcContent
 import org.succlz123.app.acfun.api.bean.HomeRecommendItem
@@ -12,15 +14,15 @@ import org.succlz123.lib.vm.BaseViewModel
 
 class HomeRankViewModel : BaseViewModel() {
 
-    val rank = mutableStateOf<ScreenResult<ArrayList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
+    val rank = MutableStateFlow<ScreenResult<ImmutableList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
 
     val rankOption = mapOf("今日" to "DAY", "三天" to "THREE_DAYS", "本周" to "WEEK")
 
-    val rankSelectIndex = mutableStateOf(0)
+    val rankSelectIndex = MutableStateFlow(0)
 
     fun getRankData(key: String = "今日", isForce: Boolean = false) {
         fetch(rank, isForce, true) {
-            getRankFromNetwork(rankOption[key].orEmpty())
+            getRankFromNetwork(rankOption[key].orEmpty())?.toImmutableList()
         }
     }
 

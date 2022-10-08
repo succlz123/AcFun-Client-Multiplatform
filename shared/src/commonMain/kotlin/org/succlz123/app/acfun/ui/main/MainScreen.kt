@@ -9,8 +9,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,11 +27,15 @@ fun MainScreen(modifier: Modifier) {
     val homeVm = viewModel(MainViewModel::class) {
         MainViewModel()
     }
+    val leftSelectItem = homeVm.leftSelectItem.collectAsState()
     if (isExpandedScreen) {
         Row(
             modifier = modifier.background(Color.White), verticalAlignment = Alignment.CenterVertically
         ) {
-            MainLeft(Modifier.fillMaxHeight().background(ColorResource.background), isExpandedScreen, homeVm)
+            MainLeft(Modifier.fillMaxHeight().background(ColorResource.background),
+                isExpandedScreen,
+                { homeVm.leftSelectItem.value = it },
+                { leftSelectItem.value })
             Column {
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(0.dp, 18.dp, 0.dp, 8.dp),
@@ -42,38 +45,9 @@ fun MainScreen(modifier: Modifier) {
                         url = "ic_acfun_title.png", modifier = Modifier.width(83.dp).height(25.dp)
                     )
                 }
-                val rightModifier = remember {
-                    Modifier.fillMaxHeight().weight(1f)
-                }
-                when (homeVm.leftSelectItem.value) {
-                    0 -> {
-                        MainHomeTab(modifier = rightModifier, isExpandedScreen)
-                    }
-
-                    1 -> {
-                        MainLiveTab(modifier = rightModifier, isExpandedScreen)
-                    }
-
-                    2 -> {
-                        MainRankTab(modifier = rightModifier, isExpandedScreen)
-                    }
-
-                    3 -> {
-                        MainSearchTab(modifier = rightModifier, isExpandedScreen)
-                    }
-
-                    4 -> {
-                        MainDownloadTab(modifier = rightModifier, isExpandedScreen)
-                    }
-
-                    5 -> {
-                        MainSettingTab(modifier = rightModifier)
-                    }
-
-                    else -> {
-                        Box(modifier = Modifier.background(Color.White).fillMaxHeight().weight(1f))
-                    }
-                }
+                MainRight(
+                    Modifier.background(Color.White).fillMaxHeight().weight(1f), isExpandedScreen
+                ) { leftSelectItem.value }
             }
         }
     } else {
@@ -85,69 +59,43 @@ fun MainScreen(modifier: Modifier) {
                     url = "ic_acfun_title.png", modifier = Modifier.width(83.dp).height(25.dp)
                 )
             }
-            MainLeft(Modifier.fillMaxWidth(), isExpandedScreen, homeVm)
-            val rightModifier = Modifier.fillMaxHeight().weight(1f)
-            when (homeVm.leftSelectItem.value) {
-                0 -> {
-                    MainHomeTab(modifier = rightModifier, isExpandedScreen)
-                }
-
-                1 -> {
-                    MainLiveTab(modifier = rightModifier, isExpandedScreen)
-                }
-
-                2 -> {
-                    MainRankTab(modifier = rightModifier, isExpandedScreen)
-                }
-
-                3 -> {
-                    MainSearchTab(modifier = rightModifier, isExpandedScreen)
-                }
-
-                4 -> {
-                    MainDownloadTab(modifier = rightModifier, isExpandedScreen)
-                }
-
-                5 -> {
-                    MainSettingTab(modifier = rightModifier)
-                }
-
-                else -> {
-                    Box(modifier = Modifier.background(Color.White).fillMaxHeight().weight(1f))
-                }
-            }
+            MainLeft(Modifier.fillMaxWidth(),
+                isExpandedScreen,
+                { homeVm.leftSelectItem.value = it },
+                { leftSelectItem.value })
+            MainRight(
+                Modifier.background(Color.White).fillMaxHeight().weight(1f), isExpandedScreen
+            ) { leftSelectItem.value }
         }
     }
 }
 
 @Composable
-fun MainLeft(modifier: Modifier, isExpandedScreen: Boolean, mainVm: MainViewModel) {
+fun MainLeft(modifier: Modifier, isExpandedScreen: Boolean, changeLeftSelect: (Int) -> Unit, getLeftSelect: () -> Int) {
     val scrollState = rememberLazyListState()
-    val leftSelectItem = remember { mainVm.leftSelectItem }
     if (isExpandedScreen) {
         LazyColumn(
             modifier = modifier.padding(12.dp), state = scrollState, verticalArrangement = Arrangement.Center
         ) {
-            this.mainLeft(mainVm, leftSelectItem, isExpandedScreen)
+            this.mainLeft(changeLeftSelect, getLeftSelect, isExpandedScreen)
         }
     } else {
         LazyRow(
             modifier = modifier.padding(12.dp), state = scrollState, horizontalArrangement = Arrangement.Center
         ) {
-            this.mainLeft(mainVm, leftSelectItem, isExpandedScreen)
+            this.mainLeft(changeLeftSelect, getLeftSelect, isExpandedScreen)
         }
     }
 }
 
-fun LazyListScope.mainLeft(mainVm: MainViewModel, leftSelectItem: MutableState<Int>, isExpandedScreen: Boolean) {
-    itemsIndexed(mainVm.leftTitle) { index, item ->
+fun LazyListScope.mainLeft(
+    changeLeftSelect: (Int) -> Unit, getLeftSelect: () -> Int, isExpandedScreen: Boolean
+) {
+    itemsIndexed(MainViewModel.MAIN_TITLE) { index, item ->
         Card(
             modifier = Modifier.noRippleClickable {
-                leftSelectItem.value = index
-            },
-            shape = RoundedCornerShape(8.dp),
-            elevation = 0.dp,
-            backgroundColor = if (index == leftSelectItem.value) {
+                changeLeftSelect(index)
+            }, shape = RoundedCornerShape(8.dp), elevation = 0.dp, backgroundColor = if (index == getLeftSelect()) {
                 ColorResource.acRed
             } else {
                 Color.Transparent
@@ -160,10 +108,10 @@ fun LazyListScope.mainLeft(mainVm: MainViewModel, leftSelectItem: MutableState<I
                     modifier = Modifier.padding(12.dp, 8.dp)
                 ) {
                     Icon(
-                        mainVm.leftIcon[index],
+                        MainViewModel.MAIN_ICON[index],
                         modifier = Modifier.size(20.dp),
                         contentDescription = item,
-                        tint = if (index == leftSelectItem.value) {
+                        tint = if (index == getLeftSelect()) {
                             Color.White
                         } else {
                             Color.LightGray
@@ -171,7 +119,7 @@ fun LazyListScope.mainLeft(mainVm: MainViewModel, leftSelectItem: MutableState<I
                     )
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
-                        item, style = MaterialTheme.typography.body1, color = if (index == leftSelectItem.value) {
+                        item, style = MaterialTheme.typography.body1, color = if (index == getLeftSelect()) {
                             Color.White
                         } else {
                             Color.Gray
@@ -185,10 +133,10 @@ fun LazyListScope.mainLeft(mainVm: MainViewModel, leftSelectItem: MutableState<I
                     modifier = Modifier.padding(12.dp, 8.dp)
                 ) {
                     Icon(
-                        mainVm.leftIcon[index],
+                        MainViewModel.MAIN_ICON[index],
                         modifier = Modifier.size(20.dp),
                         contentDescription = item,
-                        tint = if (index == leftSelectItem.value) {
+                        tint = if (index == getLeftSelect()) {
                             Color.White
                         } else {
                             Color.LightGray
@@ -196,7 +144,7 @@ fun LazyListScope.mainLeft(mainVm: MainViewModel, leftSelectItem: MutableState<I
                     )
                     Spacer(modifier = Modifier.width(3.dp))
                     Text(
-                        item, style = MaterialTheme.typography.body1, color = if (index == leftSelectItem.value) {
+                        item, style = MaterialTheme.typography.body1, color = if (index == getLeftSelect()) {
                             Color.White
                         } else {
                             Color.Gray
@@ -206,6 +154,39 @@ fun LazyListScope.mainLeft(mainVm: MainViewModel, leftSelectItem: MutableState<I
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
+    }
+}
+
+@Composable
+fun MainRight(modifier: Modifier, isExpandedScreen: Boolean, leftSelectItem: () -> Int) {
+    when (leftSelectItem()) {
+        0 -> {
+            MainHomeTab(modifier = modifier, isExpandedScreen)
+        }
+
+        1 -> {
+            MainLiveTab(modifier = modifier, isExpandedScreen)
+        }
+
+        2 -> {
+            MainRankTab(modifier = modifier, isExpandedScreen)
+        }
+
+        3 -> {
+            MainSearchTab(modifier = modifier, isExpandedScreen)
+        }
+
+        4 -> {
+            MainDownloadTab(modifier = modifier, isExpandedScreen)
+        }
+
+        5 -> {
+            MainSettingTab(modifier = modifier)
+        }
+
+        else -> {
+            Box(modifier = modifier)
+        }
     }
 }
 

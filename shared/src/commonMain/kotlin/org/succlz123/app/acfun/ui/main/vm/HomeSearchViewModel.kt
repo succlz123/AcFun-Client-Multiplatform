@@ -1,6 +1,8 @@
 package org.succlz123.app.acfun.ui.main.vm
 
-import androidx.compose.runtime.mutableStateOf
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.decodeFromString
 import org.seimicrawler.xpath.JXDocument
 import org.succlz123.app.acfun.api.AcfunApiService
@@ -13,8 +15,8 @@ import org.succlz123.lib.screen.result.ScreenResult
 import kotlin.collections.set
 
 class HomeSearchViewModel : ScreenPageViewModel() {
-    val searchText = mutableStateOf("")
-    val search = mutableStateOf<ScreenResult<ArrayList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
+    val searchText = MutableStateFlow("")
+    val search = MutableStateFlow<ScreenResult<ImmutableList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
 
     fun search() {
         if (searchText.value.isEmpty()) {
@@ -23,7 +25,7 @@ class HomeSearchViewModel : ScreenPageViewModel() {
         page = 0
         hasMore = true
         fetch(search, true, true) {
-            getSearchData(java.net.URLEncoder.encode(searchText.value, "utf-8"))
+            getSearchData(java.net.URLEncoder.encode(searchText.value, "utf-8"))?.toImmutableList()
         }
     }
 
@@ -32,7 +34,7 @@ class HomeSearchViewModel : ScreenPageViewModel() {
             return
         }
         fetch(search, true, false) {
-            getSearchData(java.net.URLEncoder.encode(searchText.value, "utf-8"))
+            getSearchData(java.net.URLEncoder.encode(searchText.value, "utf-8"))?.toImmutableList()
         }
     }
 

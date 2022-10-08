@@ -1,7 +1,9 @@
 package org.succlz123.app.acfun.ui.area
 
-import androidx.compose.runtime.mutableStateOf
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.seimicrawler.xpath.JXDocument
 import org.succlz123.app.acfun.api.bean.AcContent
@@ -32,11 +34,11 @@ class AreaContentViewModel : ScreenPageViewModel() {
         )
     }
 
-    val areaVideosState = mutableStateOf<ScreenResult<ArrayList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
+    val areaVideosState = MutableStateFlow<ScreenResult<ImmutableList<HomeRecommendItem>>>(ScreenResult.Uninitialized)
 
     var defaultSor = rankScore
 
-    val rankSelectIndex = mutableStateOf(0)
+    val rankSelectIndex: MutableStateFlow<Int> = MutableStateFlow(0)
 
     init {
         page = 1
@@ -67,20 +69,17 @@ class AreaContentViewModel : ScreenPageViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val data = getFromNetwork(id, sort)
-                var cur = areaVideosState.value.invoke()
+                var cur = ArrayList(areaVideosState.value.invoke().orEmpty())
                 if (data.isNullOrEmpty()) {
-                    if (cur.isNullOrEmpty()) {
+                    if (cur.isEmpty()) {
                         areaVideosState.value = screenResultDataNone()
                     } else {
                         hasMore = false
                     }
                 } else {
-                    if (cur == null) {
-                        cur = ArrayList()
-                    }
                     cur.addAll(data)
                     page++
-                    areaVideosState.value = ScreenResult.Success(cur)
+                    areaVideosState.value = ScreenResult.Success(cur.toImmutableList())
                 }
             } catch (e: Exception) {
                 areaVideosState.value = ScreenResult.Fail(e)

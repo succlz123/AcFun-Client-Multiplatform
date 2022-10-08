@@ -18,8 +18,7 @@ class DownloadRequest(
     var m3u8FilePath: String? = null
 
     fun key(): String {
-        val urlHash = hashKey(url.orEmpty())
-        return urlHash + "_${id}"
+        return hashKey(id.orEmpty())
     }
 }
 

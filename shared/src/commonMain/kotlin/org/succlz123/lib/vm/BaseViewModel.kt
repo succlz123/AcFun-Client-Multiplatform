@@ -2,6 +2,7 @@ package org.succlz123.lib.vm
 
 import androidx.compose.runtime.MutableState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.succlz123.lib.screen.result.ScreenResult
 import org.succlz123.lib.screen.viewmodel.ScreenViewModel
@@ -9,7 +10,7 @@ import org.succlz123.lib.screen.viewmodel.ScreenViewModel
 open class BaseViewModel : ScreenViewModel() {
 
     fun <T> fetch(
-        result: MutableState<ScreenResult<T>>,
+        result: MutableStateFlow<ScreenResult<T>>,
         isForce: Boolean = false,
         isRefresh: Boolean = false,
         content: suspend () -> T?

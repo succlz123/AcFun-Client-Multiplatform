@@ -15,7 +15,7 @@ import org.succlz123.app.acfun.base.AcDivider
 fun MainRightTitleLayout(
     modifier: Modifier = Modifier,
     text: String,
-    topRightContent: @Composable() (() -> Unit)? = null,
+    topRightContent: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Column(modifier = modifier.background(Color.White)) {

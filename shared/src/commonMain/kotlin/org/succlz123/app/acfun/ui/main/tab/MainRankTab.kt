@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -26,14 +26,14 @@ fun MainRankTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
     val rankVm = viewModel {
         HomeRankViewModel()
     }
-    val optionalState = remember { rankVm.rankSelectIndex }
+    val optionalState = rankVm.rankSelectIndex.collectAsState()
     MainRightTitleLayout(modifier, text = "全站排行", topRightContent = {
         val optional = rankVm.rankOption.keys.toList()
         LazyRow(modifier = Modifier) {
             itemsIndexed(optional) { index, item ->
                 Text(
                     modifier = Modifier.padding(12.dp, 0.dp).noRippleClickable {
-                        optionalState.value = index
+                        rankVm.rankSelectIndex.value = index
                     }, text = item, fontSize = 16.sp, color = if (optionalState.value == index) {
                         ColorResource.acRed
                     } else {
@@ -50,7 +50,7 @@ fun MainRankTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
             }
         }
         MainHomeContentItem(
-            result = rankVm.rank.value,
+            result = rankVm.rank.collectAsState().value,
             isExpandedScreen = isExpandedScreen,
             onRefresh = {
                 rankVm.getRankData(ArrayList(rankVm.rankOption.keys.toList())[optionalState.value], isForce = true)

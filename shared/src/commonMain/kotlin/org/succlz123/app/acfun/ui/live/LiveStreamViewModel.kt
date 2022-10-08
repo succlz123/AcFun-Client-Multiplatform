@@ -1,11 +1,11 @@
 package org.succlz123.app.acfun.ui.live
 
-import androidx.compose.runtime.mutableStateOf
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.JsonArray
@@ -21,7 +21,7 @@ import org.succlz123.lib.screen.result.ScreenResult
 
 class LiveStreamViewModel : ScreenPageViewModel() {
 
-    val liveSteam = mutableStateOf<ScreenResult<List<Representation>>>(ScreenResult.Uninitialized)
+    val liveSteam = MutableStateFlow<ScreenResult<List<Representation>>>(ScreenResult.Uninitialized)
 
     fun getLiveStreamData(roomId: String) {
         viewModelScope.launch(Dispatchers.IO) {

@@ -1,9 +1,9 @@
 package org.succlz123.app.acfun.ui.user
 
-import androidx.compose.runtime.mutableStateOf
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.seimicrawler.xpath.JXDocument
@@ -16,7 +16,7 @@ import org.succlz123.lib.screen.result.ScreenResult
 
 class UserSpaceViewModel : ScreenPageViewModel() {
 
-    val userSpaceState = mutableStateOf<ScreenResult<ArrayList<AcContent>>>(ScreenResult.Uninitialized)
+    val userSpaceState = MutableStateFlow<ScreenResult<ArrayList<AcContent>>>(ScreenResult.Uninitialized)
 
     init {
         page = 1

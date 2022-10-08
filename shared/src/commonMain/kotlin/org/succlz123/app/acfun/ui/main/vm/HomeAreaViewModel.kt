@@ -1,8 +1,9 @@
 package org.succlz123.app.acfun.ui.main.vm
 
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.jsoup.select.Elements
@@ -22,9 +23,9 @@ class HomeAreaViewModel : BaseViewModel() {
         val CATEGORY = CategoryManager.getHomeCategory().children
     }
 
-    val rightSelectedCategoryItem = mutableStateOf(0)
+    val rightSelectedCategoryItem = MutableStateFlow(0)
 
-    val recommendMap = mutableStateMapOf<Int, ScreenResult<ArrayList<HomeRecommendItem>>>()
+    val recommendMap = MutableStateFlow(emptyMap<Int, ScreenResult<ImmutableList<HomeRecommendItem>>>())
 
     fun getData(isForce: Boolean = false) {
         if (rightSelectedCategoryItem.value == 0) {
@@ -35,23 +36,23 @@ class HomeAreaViewModel : BaseViewModel() {
     }
 
     private fun getHomeData(isForce: Boolean = false) {
-        if (recommendMap[-1] is ScreenResult.Loading) {
+        if (recommendMap.value[-1] is ScreenResult.Loading) {
             return
         }
-        if (!isForce && recommendMap[-1] is ScreenResult.Success) {
+        if (!isForce && recommendMap.value[-1] is ScreenResult.Success) {
             return
         }
-        recommendMap[-1] = ScreenResult.Loading()
+        recommendMap.value += hashMapOf(-1 to ScreenResult.Loading())
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = getHomeFromNetwork()
                 if (response.isNullOrEmpty()) {
-                    recommendMap[-1] = ScreenResult.Fail(NullPointerException())
+                    recommendMap.value += hashMapOf(-1 to ScreenResult.Fail(NullPointerException()))
                 } else {
-                    recommendMap[-1] = ScreenResult.Success(response)
+                    recommendMap.value += hashMapOf(-1 to ScreenResult.Success(response.toImmutableList()))
                 }
             } catch (e: Exception) {
-                recommendMap[-1] = ScreenResult.Fail(e)
+                recommendMap.value += hashMapOf(-1 to ScreenResult.Fail(e))
                 e.printStackTrace()
             }
         }
@@ -153,23 +154,23 @@ class HomeAreaViewModel : BaseViewModel() {
     }
 
     fun getAreaData(categoryId: Int, isForce: Boolean = false) {
-        if (recommendMap[categoryId] is ScreenResult.Loading) {
+        if (recommendMap.value[categoryId] is ScreenResult.Loading) {
             return
         }
-        if (!isForce && recommendMap[categoryId] is ScreenResult.Success) {
+        if (!isForce && recommendMap.value[categoryId] is ScreenResult.Success) {
             return
         }
-        recommendMap[categoryId] = ScreenResult.Loading()
+        recommendMap.value += hashMapOf(categoryId to ScreenResult.Loading())
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = getAreaFromNetwork(categoryId)
                 if (response.isNullOrEmpty()) {
-                    recommendMap[categoryId] = ScreenResult.Fail(NullPointerException())
+                    recommendMap.value += hashMapOf(categoryId to ScreenResult.Fail(NullPointerException()))
                 } else {
-                    recommendMap[categoryId] = ScreenResult.Success(response)
+                    recommendMap.value += hashMapOf(categoryId to ScreenResult.Success(response.toImmutableList()))
                 }
             } catch (e: Exception) {
-                recommendMap[categoryId] = ScreenResult.Fail(e)
+                recommendMap.value += hashMapOf(categoryId to ScreenResult.Fail(e))
             }
         }
     }

@@ -8,11 +8,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 import org.succlz123.app.acfun.api.bean.HomeRecommendItem
 import org.succlz123.app.acfun.base.AcDivider
 import org.succlz123.app.acfun.theme.ColorResource
@@ -27,15 +28,26 @@ fun MainHomeTab(modifier: Modifier, isExpandedScreen: Boolean) {
     val homeVm = viewModel {
         HomeAreaViewModel()
     }
-    val rememberSelectedItem = remember { homeVm.rightSelectedCategoryItem }
+    val rememberSelectedItem = homeVm.rightSelectedCategoryItem.collectAsState()
     Column(modifier = modifier.background(Color.White)) {
-        showHomeTitle(change = { rememberSelectedItem.value = it }) {
+        showHomeTitle(change = { homeVm.rightSelectedCategoryItem.value = it }) {
             rememberSelectedItem.value
         }
         AcDivider()
-        val recommendMap = homeVm.recommendMap
-        showHomeContent(isExpandedScreen, { rememberSelectedItem.value = it }, { rememberSelectedItem.value }, homeVm) {
-            recommendMap[HomeAreaViewModel.CATEGORY[rememberSelectedItem.value].id] ?: ScreenResult.Uninitialized
+        val recommendMap = homeVm.recommendMap.collectAsState()
+        showHomeContent(
+            isExpandedScreen,
+            { homeVm.rightSelectedCategoryItem.value = it },
+            { rememberSelectedItem.value },
+            homeVm
+        ) {
+            if (recommendMap.value.isEmpty()) {
+                // for Android Platform - java.lang.ClassCastException: kotlin.collections.EmptyMap cannot be cast to java.util.HashMap
+                ScreenResult.Uninitialized
+            } else {
+                recommendMap.value[HomeAreaViewModel.CATEGORY[rememberSelectedItem.value].id]
+                    ?: ScreenResult.Uninitialized
+            }
         }
         LaunchedEffect(rememberSelectedItem.value) {
             homeVm.getData()
@@ -88,7 +100,7 @@ fun showHomeContent(
     changeTitleSelectIfExist: (Int) -> Unit,
     selectTitleIfExist: () -> Int,
     homeVm: HomeAreaViewModel,
-    cb: () -> ScreenResult<ArrayList<HomeRecommendItem>>
+    cb: () -> ScreenResult<ImmutableList<HomeRecommendItem>>
 ) {
     MainHomeContentItem(result = cb.invoke(),
         changeTitleSelectIfExist = changeTitleSelectIfExist,

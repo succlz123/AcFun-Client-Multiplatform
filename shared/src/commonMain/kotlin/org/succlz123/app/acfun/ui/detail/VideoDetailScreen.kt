@@ -6,20 +6,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults.outlinedButtonColors
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.succlz123.app.acfun.Manifest
@@ -27,6 +21,7 @@ import org.succlz123.app.acfun.api.bean.AcContent
 import org.succlz123.app.acfun.api.bean.VideoContent
 import org.succlz123.app.acfun.base.AcBackButton
 import org.succlz123.app.acfun.base.AcDivider
+import org.succlz123.app.acfun.base.LoadingFailView
 import org.succlz123.app.acfun.base.LoadingView
 import org.succlz123.app.acfun.theme.ColorResource
 import org.succlz123.lib.click.noRippleClickable
@@ -63,52 +58,18 @@ fun VideoDetailScreen() {
     Box(modifier = Modifier.fillMaxSize().background(Color.White).noRippleClickable {
         screenNavigation.cancelPopupWindow()
     }) {
-        val videoContent = viewModel.videoContentState.value
+        val videoContent = viewModel.videoContentState.collectAsState().value
         when (videoContent) {
             is ScreenResult.Uninitialized, is ScreenResult.Loading -> {
                 LoadingView()
             }
 
             is ScreenResult.Fail -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "数据加载失败!", fontSize = 32.sp, fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(48.dp))
-                    Row {
-                        Button(colors = outlinedButtonColors(
-                            backgroundColor = Color.Black,
-                            contentColor = Color.White,
-                            disabledContentColor = Color.Transparent
-                        ), contentPadding = PaddingValues(
-                            start = 32.dp, top = 10.dp, end = 32.dp, bottom = 10.dp
-                        ), onClick = {
-                            screenNavigation.pop()
-                        }) {
-                            Text(
-                                text = "退出", fontSize = 18.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(32.dp))
-                        Button(colors = outlinedButtonColors(
-                            backgroundColor = Color.Black,
-                            contentColor = Color.White,
-                            disabledContentColor = Color.Transparent
-                        ), contentPadding = PaddingValues(
-                            start = 32.dp, top = 10.dp, end = 32.dp, bottom = 10.dp
-                        ), onClick = {
-                            viewModel.getDetail(acContent, true)
-                        }) {
-                            Text(
-                                text = "重试", fontSize = 18.sp
-                            )
-                        }
-                    }
-                }
+                LoadingFailView(cancelClick = {
+                    screenNavigation.pop()
+                }, okClick = {
+                    viewModel.getDetail(acContent, true)
+                })
             }
 
             is ScreenResult.Success -> {
@@ -222,11 +183,16 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                             it.invoke().playerList?.adaptationSet?.firstOrNull()?.representation?.firstOrNull()?.url
                         val downloadState = FileDownLoader.instance().get(
                             DownloadRequest(
-                                url = url, title = acContent.title + if ((vContent.videoList?.size ?: 0) > 1) {
+                                id = it.invoke().videoList?.get(it.invoke().epIndex - 1)?.id
+                                    ?: (it.invoke().title + it.invoke().epIndex),
+                                url = url,
+                                title = acContent.title + if ((vContent.videoList?.size ?: 0) > 1) {
                                     "_P${it.invoke().epIndex}"
                                 } else {
                                     ""
-                                }, image = acContent.img, tag = acContent.up
+                                },
+                                image = acContent.img,
+                                tag = acContent.up
                             )
                         )
                         when (downloadState.downloadStateType.value) {
@@ -235,7 +201,7 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                             }
 
                             DownloadStateType.Finish -> {
-                                screenNavigation.toast("视频已经下载成功")
+                                screenNavigation.toast("视频已经下载成功, 请去下载页面查看")
                             }
 
                             DownloadStateType.Uninitialized, is DownloadStateType.Error, DownloadStateType.Pause -> {
@@ -275,43 +241,41 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                     }, contentAlignment = Alignment.Center) {
                         Text(text = (index + 1).toString(), style = MaterialTheme.typography.h3)
                     }
-                    PopupWindowLayout(modifier = Modifier.align(Alignment.CenterEnd),
-                        displayContent = {
-                            Card(
-                                modifier = Modifier.padding(12.dp),
-                                shape = RoundedCornerShape(8.dp),
-                                elevation = 3.dp,
-                                backgroundColor = Color.White
+                    PopupWindowLayout(modifier = Modifier.align(Alignment.CenterEnd), displayContent = {
+                        Card(
+                            modifier = Modifier.padding(12.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = 3.dp,
+                            backgroundColor = Color.White
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(24.dp),
+                                verticalArrangement = Arrangement.Center,
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(24.dp),
-                                    verticalArrangement = Arrangement.Center,
-                                ) {
-                                    OptionItem(modifier = Modifier.noRippleClickable {
-                                        if (getPlatformName() == "Android") {
-                                            screenNavigation.toast("Android 还未适配下载...")
-                                            screenNavigation.cancelPopupWindow()
-                                            return@noRippleClickable
-                                        }
-                                        viewModel.download(acContent, index + 1)
+                                OptionItem(modifier = Modifier.noRippleClickable {
+                                    if (getPlatformName() == "Android") {
+                                        screenNavigation.toast("Android 还未适配下载...")
                                         screenNavigation.cancelPopupWindow()
-                                    }, "下载视频")
-                                    Spacer(modifier = Modifier.height(24.dp))
-                                    AcDivider()
-                                    Spacer(modifier = Modifier.height(24.dp))
-                                    OptionItem(modifier = Modifier.noRippleClickable {
-                                        screenNavigation.toast("开发中...")
-                                        screenNavigation.cancelPopupWindow()
-                                    }, "无线投屏")
-                                }
+                                        return@noRippleClickable
+                                    }
+                                    viewModel.download(acContent, index + 1)
+                                    screenNavigation.cancelPopupWindow()
+                                }, "下载视频")
+                                Spacer(modifier = Modifier.height(24.dp))
+                                AcDivider()
+                                Spacer(modifier = Modifier.height(24.dp))
+                                OptionItem(modifier = Modifier.noRippleClickable {
+                                    screenNavigation.toast("开发中...")
+                                    screenNavigation.cancelPopupWindow()
+                                }, "无线投屏")
                             }
-                        },
-                        clickableContent = {
-                            AsyncImageUrlMultiPlatform(
-                                url = "ic_show_more.png",
-                                modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp).width(20.dp).height(20.dp)
-                            )
-                        })
+                        }
+                    }, clickableContent = {
+                        AsyncImageUrlMultiPlatform(
+                            url = "ic_show_more.png",
+                            modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp).width(20.dp).height(20.dp)
+                        )
+                    })
                 }
             }
         }

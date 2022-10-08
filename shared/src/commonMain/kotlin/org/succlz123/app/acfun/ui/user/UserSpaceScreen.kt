@@ -2,20 +2,19 @@ package org.succlz123.app.acfun.ui.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kotlinx.collections.immutable.toImmutableList
 import org.succlz123.app.acfun.api.bean.HomeRecommendItem
 import org.succlz123.app.acfun.base.AcBackButton
+import org.succlz123.app.acfun.base.LoadingFailView
 import org.succlz123.app.acfun.base.LoadingView
 import org.succlz123.app.acfun.ui.main.tab.item.MainHomeContentItem
 import org.succlz123.lib.screen.LocalScreenNavigator
@@ -45,56 +44,19 @@ fun UserSpaceScreen() {
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        val state = viewModel.userSpaceState.value
+        val state = viewModel.userSpaceState.collectAsState().value
         when (state) {
             is ScreenResult.Uninitialized -> {
                 LoadingView()
             }
 
             is ScreenResult.Fail -> {
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(32.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "数据加载失败!", fontSize = 32.sp, fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(48.dp))
-                    Row {
-                        Button(colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color.Black,
-                            contentColor = Color.White,
-                            disabledContentColor = Color.Transparent
-                        ), contentPadding = PaddingValues(
-                            start = 32.dp, top = 10.dp, end = 32.dp, bottom = 10.dp
-                        ), onClick = {
-                            navigationScene.pop()
-                        }) {
-                            Text(
-                                text = "退出", fontSize = 18.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(32.dp))
-                        Button(colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color.Black,
-                            contentColor = Color.White,
-                            disabledContentColor = Color.Transparent
-                        ), contentPadding = PaddingValues(
-                            start = 32.dp, top = 10.dp, end = 32.dp, bottom = 10.dp
-                        ), onClick = {
-                            viewModel.loadMoreUpSpace(id)
-                        }) {
-                            Text(
-                                text = "重试", fontSize = 18.sp
-                            )
-                        }
-                    }
-                }
+                LoadingFailView(cancelClick = { navigationScene.pop() }, okClick = {
+                    viewModel.loadMoreUpSpace(id)
+                })
             }
 
             is ScreenResult.Success, is ScreenResult.Loading -> {
-                val acContentList = state.invoke()?.map { HomeRecommendItem().apply { item = it } }
                 Column(
                     modifier = Modifier.fillMaxSize().padding(0.dp, 48.dp, 0.dp, 0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -109,11 +71,11 @@ fun UserSpaceScreen() {
                         Spacer(modifier = Modifier.weight(1f))
                     }
                     Spacer(modifier = Modifier.height(16.dp))
+                    val acContentList = state.invoke()?.map { HomeRecommendItem().apply { item = it } }
                     if (acContentList.isNullOrEmpty()) {
                         LoadingView()
                     } else {
-                        val content = ArrayList(acContentList)
-                        MainHomeContentItem(result = ScreenResult.Success(content),
+                        MainHomeContentItem(result = ScreenResult.Success(acContentList.toImmutableList()),
                             isExpandedScreen = isExpandedScreen,
                             onRefresh = {
                                 viewModel.loadMoreUpSpace(id, true)

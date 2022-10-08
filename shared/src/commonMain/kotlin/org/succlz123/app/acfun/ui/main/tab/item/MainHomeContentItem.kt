@@ -11,6 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 import org.succlz123.app.acfun.Manifest
 import org.succlz123.app.acfun.api.bean.HomeRecommendItem
@@ -30,7 +31,7 @@ import org.succlz123.lib.scroll.rememberVerticalScrollbarAdapter
 @Composable
 fun MainHomeContentItem(
     modifier: Modifier = Modifier,
-    result: ScreenResult<ArrayList<HomeRecommendItem>>,
+    result: ScreenResult<ImmutableList<HomeRecommendItem>>,
     changeTitleSelectIfExist: (Int) -> Unit = {},
     selectTitleIfExist: () -> Int = { 0 },
     isExpandedScreen: Boolean = true,
@@ -70,7 +71,7 @@ fun MainHomeContentItem(
 @Composable
 private fun MainHomeContentItemSuccess(
     modifier: Modifier,
-    content: ArrayList<HomeRecommendItem>,
+    content: ImmutableList<HomeRecommendItem>,
     changeTitleSelectIfExist: (Int) -> Unit,
     selectTitleIfExist: () -> Int,
     isExpandedScreen: Boolean,
@@ -83,9 +84,9 @@ private fun MainHomeContentItemSuccess(
     } else {
         2
     }
-    val scrollState = rememberLazyGridState()
-    val scrollContext = rememberGridScrollContext(scrollState)
     Box(modifier = modifier) {
+        val scrollState = rememberLazyGridState()
+        val scrollContext = rememberGridScrollContext(scrollState)
         VerticalScrollbar(
             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
             adapter = rememberVerticalScrollbarAdapter(scrollState, GridCells.Fixed(gridCount), null)

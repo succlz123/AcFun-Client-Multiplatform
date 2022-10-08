@@ -1,6 +1,6 @@
 package org.succlz123.app.acfun.ui.main.vm
 
-import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.succlz123.lib.setting.createSettings
 import org.succlz123.lib.vm.BaseViewModel
 
@@ -17,7 +17,7 @@ class HomeSettingViewModel : BaseViewModel() {
 
     val setting = createSettings("AcFun_APP")
 
-    val danmakuEnable = mutableStateOf(setting.getBoolean(KEY_DANMAKU_ENABLE, false))
+    val danmakuEnable = MutableStateFlow(setting.getBoolean(KEY_DANMAKU_ENABLE, false))
 
-    val videoSpeed = mutableStateOf(setting.getString(KEY_VIDEO_SPEED, "1.0"))
+    val videoSpeed = MutableStateFlow(setting.getString(KEY_VIDEO_SPEED, "1.0"))
 }

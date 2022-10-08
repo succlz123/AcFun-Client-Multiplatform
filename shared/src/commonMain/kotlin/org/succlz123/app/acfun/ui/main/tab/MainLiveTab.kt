@@ -2,6 +2,7 @@ package org.succlz123.app.acfun.ui.main.tab
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import org.succlz123.app.acfun.ui.main.tab.item.MainHomeContentItem
 import org.succlz123.app.acfun.ui.main.tab.item.MainRightTitleLayout
@@ -18,7 +19,7 @@ fun MainLiveTab(modifier: Modifier, isExpandedScreen: Boolean) {
     }
     MainRightTitleLayout(modifier, text = "直播") {
         MainHomeContentItem(
-            result = liveVm.homeLiveRoomList.value,
+            result = liveVm.homeLiveRoomList.collectAsState().value,
             isExpandedScreen = isExpandedScreen,
             onRefresh = {
                 liveVm.refreshLiveRoomData()

@@ -40,7 +40,7 @@ fun VideoPlayerCover(
     Box(modifier = Modifier.fillMaxSize().noRippleClickable {
         playerViewModel.showControllerCover.value = !playerViewModel.showControllerCover.value
     }) {
-        if (playerViewModel.showControllerCover.value) {
+        if (playerViewModel.showControllerCover.collectAsState().value) {
             Column(modifier = Modifier.fillMaxSize().noRippleClickable {
                 playerViewModel.showControllerCover.value = !playerViewModel.showControllerCover.value
             }) {

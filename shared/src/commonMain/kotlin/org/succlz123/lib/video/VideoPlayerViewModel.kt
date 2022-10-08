@@ -1,6 +1,5 @@
 package org.succlz123.lib.video
 
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +28,7 @@ class VideoPlayerViewModel : ScreenViewModel() {
 
     val currentWorkDanmaku: MutableStateFlow<MutableList<DanmakuBean>> = MutableStateFlow(arrayListOf())
 
-    val showControllerCover = mutableStateOf(true)
+    val showControllerCover = MutableStateFlow(true)
 
     private var curRunnableJob: Job? = null
 

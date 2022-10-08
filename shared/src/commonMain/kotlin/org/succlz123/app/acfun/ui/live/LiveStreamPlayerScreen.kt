@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +37,6 @@ fun LiveStreamPlayerScreen() {
         LaunchedEffect(Unit) {
             liveViewModel.getLiveStreamData(id)
         }
-        val representations = liveViewModel.liveSteam.value.invoke()
         Box(modifier = Modifier.fillMaxSize().background(Color.Black).onPreviewKeyEvent {
             if (it.key == Key.Spacebar && it.type == KeyEventType.KeyDown) {
                 if (playerViewModel.videoPlayerState.value is VideoPlayerState.Playing) {
@@ -47,6 +47,7 @@ fun LiveStreamPlayerScreen() {
             }
             false
         }) {
+            val representations = liveViewModel.liveSteam.collectAsState().value.invoke()
             if (representations.isNullOrEmpty()) {
                 LoadingView()
             } else {
