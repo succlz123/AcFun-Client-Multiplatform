@@ -20,7 +20,6 @@ import org.succlz123.app.acfun.Manifest
 import org.succlz123.app.acfun.api.bean.AcContent
 import org.succlz123.app.acfun.api.bean.VideoContent
 import org.succlz123.app.acfun.base.AcBackButton
-import org.succlz123.app.acfun.base.AcDivider
 import org.succlz123.app.acfun.base.LoadingFailView
 import org.succlz123.app.acfun.base.LoadingView
 import org.succlz123.app.acfun.theme.ColorResource
@@ -167,7 +166,6 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
         Spacer(modifier = Modifier.fillMaxWidth().height(18.dp))
         Text(text = "分集： \n", style = MaterialTheme.typography.h5)
 
-
         LaunchedEffect(Unit) {
             viewModel.downloadVideoContentEvent.collect {
                 when (it) {
@@ -197,7 +195,7 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                         )
                         when (downloadState.downloadStateType.value) {
                             DownloadStateType.Starting, DownloadStateType.Downloading -> {
-                                screenNavigation.toast("下载中...")
+                                screenNavigation.toast("已经在下载队列中...")
                             }
 
                             DownloadStateType.Finish -> {
@@ -236,7 +234,7 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                     modifier = Modifier.weight(1f).height(52.dp).clip(MaterialTheme.shapes.medium)
                         .background(ColorResource.background)
                 ) {
-                    Box(modifier = Modifier.align(Alignment.Center).fillMaxWidth().noRippleClickable {
+                    Box(modifier = Modifier.align(Alignment.Center).noRippleClickable {
                         viewModel.play(acContent, index + 1)
                     }, contentAlignment = Alignment.Center) {
                         Text(text = (index + 1).toString(), style = MaterialTheme.typography.h3)
@@ -261,8 +259,6 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                                     viewModel.download(acContent, index + 1)
                                     screenNavigation.cancelPopupWindow()
                                 }, "下载视频")
-                                Spacer(modifier = Modifier.height(24.dp))
-                                AcDivider()
                                 Spacer(modifier = Modifier.height(24.dp))
                                 OptionItem(modifier = Modifier.noRippleClickable {
                                     screenNavigation.toast("开发中...")

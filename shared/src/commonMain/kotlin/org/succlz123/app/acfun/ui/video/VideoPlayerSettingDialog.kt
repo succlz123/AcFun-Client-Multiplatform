@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import org.succlz123.app.acfun.theme.ColorResource
 import org.succlz123.lib.click.noRippleClickable
 import org.succlz123.lib.screen.LocalScreenNavigator
-import org.succlz123.lib.screen.LocalScreenWindowSizeOwner
 import org.succlz123.lib.screen.viewmodel.sharedViewModel
+import org.succlz123.lib.screen.window.ScreenWindow
 import org.succlz123.lib.video.PlayerSetting
 import org.succlz123.lib.video.VideoPlayerViewModel
 import org.succlz123.lib.window.rememberIsWindowExpanded
@@ -29,7 +29,7 @@ import org.succlz123.lib.window.rememberIsWindowExpanded
 fun VideoPlayerSettingDialog() {
     val navigationScene = LocalScreenNavigator.current
     val density = LocalDensity.current
-    val screenSize = LocalScreenWindowSizeOwner.current.getWindowHolder().size.collectAsState()
+    val screenSize = ScreenWindow.sizeFlow.collectAsState()
 
     val playerViewModel = sharedViewModel {
         VideoPlayerViewModel()

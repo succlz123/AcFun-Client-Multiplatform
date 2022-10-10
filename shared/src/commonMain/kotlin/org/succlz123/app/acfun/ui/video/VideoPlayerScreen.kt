@@ -28,10 +28,10 @@ import org.succlz123.app.acfun.danmaku.DanmakuBean
 import org.succlz123.app.acfun.danmaku.DanmkuAnimationState
 import org.succlz123.lib.screen.LocalScreenNavigator
 import org.succlz123.lib.screen.LocalScreenRecord
-import org.succlz123.lib.screen.LocalScreenWindowSizeOwner
 import org.succlz123.lib.screen.operation.ScreenStackState
 import org.succlz123.lib.screen.value
 import org.succlz123.lib.screen.viewmodel.sharedViewModel
+import org.succlz123.lib.screen.window.ScreenWindow
 import org.succlz123.lib.video.*
 import kotlin.math.roundToInt
 
@@ -103,9 +103,7 @@ fun SimpleDanmaku(
     }
     val showTime = DANMAKU_SPEED
     val offset = remember { Offset(2.0f, 5.0f) }
-    val sizeOwner = LocalScreenWindowSizeOwner.current
-    val screenSize = remember { sizeOwner.getWindowHolder().size.value }
-    val density = LocalDensity.current
+    val screenSize = ScreenWindow.sizeFlow.collectAsState().value
 
     var recordTime = remember { 0L }
     val curTime = playerViewModel.time.collectAsState().value

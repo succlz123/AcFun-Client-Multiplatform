@@ -53,10 +53,9 @@ kotlin {
             dependencies {
                 api("androidx.appcompat:appcompat:1.5.1")
                 api("androidx.core:core-ktx:1.9.0")
-                api("androidx.window:window:1.1.0-alpha03")
 
                 api("io.coil-kt:coil-compose:2.2.1")
-                api("io.github.succlz123:compose-screen-android:0.0.2")
+                api("io.github.succlz123:compose-screen-android:0.0.3")
                 api("com.github.succlz123:HoHoPlayer:0.1.6")
             }
         }
@@ -67,7 +66,7 @@ kotlin {
         }
         val desktopMain by getting {
             dependencies {
-                api("io.github.succlz123:compose-screen-desktop:0.0.2")
+                api("io.github.succlz123:compose-screen-desktop:0.0.3")
                 api("io.github.succlz123:compose-imageloader-desktop:0.0.2")
 
                 api("uk.co.caprica:vlcj:4.7.3")

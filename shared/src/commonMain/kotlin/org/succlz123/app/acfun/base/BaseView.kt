@@ -54,9 +54,7 @@ fun LoadingFailView(modifier: Modifier = Modifier, cancelClick: () -> Unit, okCl
             }
             Spacer(modifier = Modifier.width(32.dp))
             Button(colors = outlinedButtonColors(
-                backgroundColor = Color.Black,
-                contentColor = Color.White,
-                disabledContentColor = Color.Transparent
+                backgroundColor = Color.Black, contentColor = Color.White, disabledContentColor = Color.Transparent
             ), contentPadding = PaddingValues(
                 start = 16.dp, top = 6.dp, end = 16.dp, bottom = 6.dp
             ), onClick = {
@@ -112,8 +110,8 @@ fun AcBackButton(modifier: Modifier = Modifier, tint: Color = Color.Black, onCli
 }
 
 @Composable
-fun AcDivider() {
-    Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(ColorResource.divider))
+fun AcDivider(modifier: Modifier = Modifier.fillMaxWidth()) {
+    Spacer(modifier = modifier.height(1.dp).background(ColorResource.divider))
 }
 
 @Composable

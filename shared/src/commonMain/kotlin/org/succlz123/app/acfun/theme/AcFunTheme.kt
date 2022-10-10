@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.succlz123.lib.screen.LocalScreenWindowSizeOwner
+import org.succlz123.lib.screen.window.ScreenWindow
 import org.succlz123.lib.screen.window.ScreenWindowSizeClass
 
 private val DarkColorPalette = darkColors(
@@ -65,7 +65,7 @@ fun AcFunTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable(
     val shapes = Shapes(
         small = RoundedCornerShape(8.dp), medium = RoundedCornerShape(12.dp), large = RoundedCornerShape(16.dp)
     )
-    val sizeClass = LocalScreenWindowSizeOwner.current.getWindowHolder().sizeClass.collectAsState()
+    val sizeClass = ScreenWindow.sizeClassFlow.collectAsState()
     val dimens = when (sizeClass.value) {
         ScreenWindowSizeClass.Compact -> {
             compactDimens
