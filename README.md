@@ -5,7 +5,7 @@
 <br/>
 <br/>
 <div align="center">
-<img src="https://img.shields.io/static/v1?label=version&message=1.0.3&color=success"/>
+<img src="https://img.shields.io/static/v1?label=version&message=1.0.4&color=success"/>
 <img src="https://img.shields.io/static/v1?label=platform&message=Android&color=green"/>   <img src="https://img.shields.io/static/v1?label=platform&message=Desktop&color=blue"/>
 </div>
 <br/>

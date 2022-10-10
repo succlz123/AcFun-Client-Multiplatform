@@ -123,7 +123,7 @@ OS: ${props.getProperty("os.name")} - ${props.getProperty("os.arch")} - ${props.
             Spacer(modifier = Modifier.height(24.dp))
             Text(text = "版本号", style = MaterialTheme.typography.h3)
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text = "v1.0.3", style = MaterialTheme.typography.body2)
+            Text(text = "v1.0.4", style = MaterialTheme.typography.body2)
         }
     }
 }

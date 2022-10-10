@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.succlz123"
-version = "1.0.3"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
@@ -27,10 +27,10 @@ android {
         applicationId = "org.succlz123.app.acfun"
         minSdk = 24
         targetSdk = 30
-        versionCode = 3
-        versionName = "1.0.3"
+        versionCode = 4
+        versionName = "1.0.4"
 
-//        resourceConfigurations += ["en", "zh"]
+        resourceConfigurations += mutableSetOf("en", "zh")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
