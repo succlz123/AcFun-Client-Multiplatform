@@ -81,7 +81,7 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.setSrcDirs(listOf("${project.rootDir}/shared/src/commonMain/resources"))
     defaultConfig {
-        minSdk = 24
+        minSdk = 21
         targetSdk = 30
     }
     compileOptions {
