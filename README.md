@@ -5,7 +5,7 @@
 <br/>
 <br/>
 <div align="center">
-<img src="https://img.shields.io/static/v1?label=version&message=1.0.4&color=success"/>
+<img src="https://img.shields.io/static/v1?label=version&message=1.0.5&color=success"/>
 <img src="https://img.shields.io/static/v1?label=platform&message=Android&color=green"/>   <img src="https://img.shields.io/static/v1?label=platform&message=Desktop&color=blue"/>
 </div>
 <br/>
@@ -77,11 +77,10 @@ https://github.com/succlz123/AcFun-Client-Multiplatform/releases
 - 首页展示，分区内容展示，视频详情展示，UP主投稿视频查看。
 - 视频播放，直播，弹幕 (简易弹幕-实验性质)，播放功能增强，变速等。
 - 搜索，下载。
-- Android Phone, Android Pad,Desktop 适配。
+- Android Phone, Android Pad, Android TV, Desktop 适配。
 
 ## 开发中功能
 
 - 支持播放选集功能。
-- Android TV 适配。
 - DLNA 投屏。
 - 番剧，文章区。

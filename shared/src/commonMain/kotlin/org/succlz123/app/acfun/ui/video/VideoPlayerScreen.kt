@@ -10,6 +10,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -59,18 +62,79 @@ fun VideoPlayerScreen() {
             it.isShow.value = false
         }
     }
+    val focusRequester = remember { FocusRequester() }
+    SideEffect {
+        focusRequester.requestFocus()
+    }
+
     val representations = videoContent?.playerList?.adaptationSet?.firstOrNull()?.representation
     val title = videoContent?.title ?: localVideoTitle.orEmpty()
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black).onPreviewKeyEvent {
-        if (it.key == Key.Spacebar && it.type == KeyEventType.KeyDown) {
-            if (playerViewModel.videoPlayerState.value is VideoPlayerState.Playing) {
-                playerViewModel.playerAction.value = VideoPlayerAction.Pause
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color.Black).onKeyEvent { keyEvent ->
+            if (keyEvent.type == KeyEventType.KeyDown) {
+                when (keyEvent.key) {
+                    Key.Spacebar, Key.Enter, Key.DirectionCenter -> {
+                        if (playerViewModel.videoPlayerState.value is VideoPlayerState.Playing) {
+                            playerViewModel.playerAction.value = VideoPlayerAction.Pause
+                        } else {
+                            playerViewModel.playerAction.value = VideoPlayerAction.Play
+                        }
+                        playerViewModel.showControllerCover.value = true
+                        true
+                    }
+
+                    Key.DirectionLeft, Key.ButtonThumbLeft -> {
+                        if (playerViewModel.playerAction.value !is VideoPlayerAction.Seek) {
+                            playerViewModel.playerAction.value = VideoPlayerAction.Seek(
+                                Math.max(
+                                    playerViewModel.time.value - 5000L, 0
+                                )
+                            )
+                        } else {
+                            playerViewModel.playerAction.value = VideoPlayerAction.Seek(
+                                Math.max(
+                                    playerViewModel.playerAction.value.seekTime - 5000L, 0
+                                )
+                            )
+                        }
+                        playerViewModel.showControllerCover.value = true
+                        true
+                    }
+
+                    Key.DirectionRight, Key.ButtonThumbRight -> {
+
+                        if (playerViewModel.playerAction.value !is VideoPlayerAction.Seek) {
+                            playerViewModel.playerAction.value = VideoPlayerAction.Seek(
+                                Math.min(
+                                    playerViewModel.time.value + 5000L, playerViewModel.duration.value
+                                )
+                            )
+                        } else {
+                            playerViewModel.playerAction.value = VideoPlayerAction.Seek(
+                                Math.min(
+                                    playerViewModel.playerAction.value.seekTime + 5000L, playerViewModel.duration.value
+                                )
+                            )
+                        }
+                        playerViewModel.showControllerCover.value = true
+                        true
+                    }
+
+                    Key.Back, Key.Escape -> {
+                        screenNavigator.pop()
+                        true
+                    }
+
+                    else -> {
+                        false
+                    }
+                }
             } else {
-                playerViewModel.playerAction.value = VideoPlayerAction.Play
+                true
             }
-        }
-        false
-    }) {
+        }.focusRequester(focusRequester).focusTarget()
+    ) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
         if (representations.isNullOrEmpty() && localVideoFilePath.isNullOrEmpty()) {
             LoadingView()
         } else {

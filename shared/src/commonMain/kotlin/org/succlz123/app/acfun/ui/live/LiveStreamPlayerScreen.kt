@@ -3,11 +3,12 @@ package org.succlz123.app.acfun.ui.live
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import org.succlz123.app.acfun.base.LoadingView
@@ -37,24 +38,47 @@ fun LiveStreamPlayerScreen() {
         LaunchedEffect(Unit) {
             liveViewModel.getLiveStreamData(id)
         }
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black).onPreviewKeyEvent {
-            if (it.key == Key.Spacebar && it.type == KeyEventType.KeyDown) {
-                if (playerViewModel.videoPlayerState.value is VideoPlayerState.Playing) {
-                    playerViewModel.playerAction.value = VideoPlayerAction.Pause
-                } else {
-                    playerViewModel.playerAction.value = VideoPlayerAction.Play
-                }
-            }
-            false
-        }) {
+        val focusRequester = remember { FocusRequester() }
+        SideEffect {
+            focusRequester.requestFocus()
+        }
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.Black)
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.type == KeyEventType.KeyDown) {
+                        when (keyEvent.key) {
+                            Key.Spacebar, Key.Enter, Key.DirectionCenter -> {
+                                if (playerViewModel.videoPlayerState.value is VideoPlayerState.Playing) {
+                                    playerViewModel.playerAction.value = VideoPlayerAction.Pause
+                                } else {
+                                    playerViewModel.playerAction.value = VideoPlayerAction.Play
+                                }
+                                playerViewModel.showControllerCover.value = true
+                                true
+                            }
+
+                            Key.Back, Key.Escape -> {
+                                screenNavigator.pop()
+                                true
+                            }
+
+                            else -> {
+                                false
+                            }
+                        }
+                    } else {
+                        true
+                    }
+                }.focusRequester(focusRequester).focusTarget()
+        ) {
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black))
             val representations = liveViewModel.liveSteam.collectAsState().value.invoke()
             if (representations.isNullOrEmpty()) {
                 LoadingView()
             } else {
                 playerViewModel.playList = representations
-                playerViewModel.curPlayerSource.value = representations.firstOrNull()
-
-                println(representations.firstOrNull())
+                playerViewModel.curPlayerSource.value = representations.lastOrNull()
+                println(representations.lastOrNull())
                 val result = VideoPlayer(Modifier, playerViewModel)
                 if (result.isNotEmpty()) {
                     screenNavigator.toast(result, time = 5000L)

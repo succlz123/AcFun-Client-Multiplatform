@@ -1,5 +1,6 @@
 package org.succlz123.app.acfun.ui.main.vm
 
+import androidx.compose.ui.focus.FocusRequester
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,8 @@ class HomeAreaViewModel : BaseViewModel() {
     val rightSelectedCategoryItem = MutableStateFlow(0)
 
     val recommendMap = MutableStateFlow(emptyMap<Int, ScreenResult<ImmutableList<HomeRecommendItem>>>())
+
+    val homeContentFocusRequester = FocusRequester()
 
     fun getData(isForce: Boolean = false) {
         if (rightSelectedCategoryItem.value == 0) {

@@ -9,7 +9,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,9 @@ fun MainSearchTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
         HomeSearchViewModel()
     }
     val inputText = searchVm.searchText.collectAsState()
+
+    val focusRequester = remember { FocusRequester() }
+
     MainRightTitleLayout(modifier, text = "搜索", topRightContent = {
         Row {
             BasicTextField(
@@ -53,6 +58,10 @@ fun MainSearchTab(modifier: Modifier = Modifier, isExpandedScreen: Boolean) {
     }) {
         MainHomeContentItem(
             result = searchVm.search.collectAsState().value,
+
+            thisRequester = focusRequester,
+            otherRequester = null,
+
             isExpandedScreen = isExpandedScreen,
             onRefresh = {
                 searchVm.search()

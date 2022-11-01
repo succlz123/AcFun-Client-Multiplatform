@@ -2,6 +2,7 @@ package org.succlz123.app.acfun.ui.main
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.*
+import androidx.compose.ui.focus.FocusRequester
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.succlz123.lib.vm.BaseViewModel
 
@@ -22,4 +23,8 @@ class MainViewModel : BaseViewModel() {
     }
 
     val leftSelectItem = MutableStateFlow(0)
+
+    val leftFocus = FocusRequester()
+
+    val rightFocus = FocusRequester()
 }

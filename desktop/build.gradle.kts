@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.succlz123"
-version = "1.0.4"
+version = "1.0.5"
 
 kotlin {
     jvm {
@@ -42,7 +42,7 @@ compose.desktop {
                 iconFile.set(project.file("ic_acfun.png"))
             }
             packageName = "AcFun"
-            packageVersion = "1.0.4"
+            packageVersion = "1.0.5"
             copyright = "Copyright © 2022"
 
             modules("java.sql", "jdk.unsupported")

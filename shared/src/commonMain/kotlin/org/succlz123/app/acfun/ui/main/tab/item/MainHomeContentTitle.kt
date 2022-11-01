@@ -1,7 +1,8 @@
 package org.succlz123.app.acfun.ui.main.tab.item
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -17,27 +18,37 @@ import org.succlz123.app.acfun.theme.ColorResource
 
 @Composable
 fun MainHomeContentTitle(
-    modifier: Modifier,
-    name: String
+    modifier: Modifier, name: String, isFocused: () -> Boolean
 ) {
-    Card(
-        modifier = modifier, elevation = 0.dp, backgroundColor = Color.Transparent
+    Box(
+        modifier = modifier
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.background(
+                if (isFocused()) {
+                    ColorResource.acRed
+                } else {
+                    Color.Transparent
+                }, shape = RoundedCornerShape(6.dp)
+            ), verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                modifier = Modifier.padding(0.dp, 6.dp),
-                text = name,
-                maxLines = 1,
-                color = ColorResource.text,
-                style = MaterialTheme.typography.h3,
-                fontWeight = FontWeight.Bold
+                modifier = Modifier.padding(12.dp, 6.dp), text = name, maxLines = 1, color = if (isFocused()) {
+                    Color.White
+                } else {
+                    ColorResource.text
+                }, style = MaterialTheme.typography.h3, fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.width(6.dp))
             Icon(
                 Icons.Sharp.KeyboardArrowRight,
                 modifier = Modifier.size(16.dp),
                 contentDescription = "Right",
-                tint = ColorResource.text
+                tint = if (isFocused()) {
+                    Color.White
+                } else {
+                    ColorResource.text
+                },
             )
             Spacer(modifier = Modifier.width(12.dp))
         }

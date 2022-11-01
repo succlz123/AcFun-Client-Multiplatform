@@ -1,5 +1,6 @@
 package org.succlz123.app.acfun.ui.area
 
+import androidx.compose.ui.focus.FocusRequester
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,8 @@ class AreaContentViewModel : ScreenPageViewModel() {
     var defaultSor = rankScore
 
     val rankSelectIndex: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    val contentFocusParent = FocusRequester()
 
     init {
         page = 1

@@ -16,6 +16,7 @@ import org.succlz123.app.acfun.api.bean.HomeRecommendItem
 import org.succlz123.app.acfun.base.AcBackButton
 import org.succlz123.app.acfun.base.LoadingFailView
 import org.succlz123.app.acfun.base.LoadingView
+import org.succlz123.app.acfun.ui.main.GlobalFocusViewModel
 import org.succlz123.app.acfun.ui.main.tab.item.MainHomeContentItem
 import org.succlz123.lib.screen.LocalScreenNavigator
 import org.succlz123.lib.screen.LocalScreenRecord
@@ -41,6 +42,14 @@ fun UserSpaceScreen() {
     }
     LaunchedEffect(key1 = id) {
         viewModel.loadMoreUpSpace(id)
+    }
+
+    val focusVm = viewModel(GlobalFocusViewModel::class) {
+        GlobalFocusViewModel()
+    }
+
+    LaunchedEffect(Unit) {
+        focusVm.curFocusRequesterParent.value = viewModel.contentFocusParent
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -71,12 +80,21 @@ fun UserSpaceScreen() {
                         Spacer(modifier = Modifier.weight(1f))
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-                    val acContentList = state.invoke()?.map { HomeRecommendItem().apply { item = it } }
+                    val acContentList = state.invoke()?.mapIndexed { index, acContent ->
+                        HomeRecommendItem().apply {
+                            innerItemCount = index
+                            item = acContent
+                        }
+                    }
                     if (acContentList.isNullOrEmpty()) {
                         LoadingView()
                     } else {
                         MainHomeContentItem(result = ScreenResult.Success(acContentList.toImmutableList()),
                             isExpandedScreen = isExpandedScreen,
+
+                            thisRequester = viewModel.contentFocusParent,
+                            otherRequester = null,
+
                             onRefresh = {
                                 viewModel.loadMoreUpSpace(id, true)
                             },

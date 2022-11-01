@@ -1,5 +1,6 @@
 package org.succlz123.app.acfun.ui.user
 
+import androidx.compose.ui.focus.FocusRequester
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,8 @@ import org.succlz123.lib.screen.result.ScreenResult
 class UserSpaceViewModel : ScreenPageViewModel() {
 
     val userSpaceState = MutableStateFlow<ScreenResult<ArrayList<AcContent>>>(ScreenResult.Uninitialized)
+
+    val contentFocusParent = FocusRequester()
 
     init {
         page = 1

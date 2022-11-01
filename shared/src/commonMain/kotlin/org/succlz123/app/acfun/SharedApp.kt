@@ -39,7 +39,7 @@ fun SharedApp() {
         Box(modifier = Modifier.fillMaxSize()) {
             ScreenHost(screenNavigator = screenNavigator, rootScreenName = Manifest.MainScreen) {
                 groupScreen(screenName = (Manifest.MainScreen)) {
-                    MainScreen(modifier = Modifier.fillMaxSize())
+                    MainScreen()
                 }
                 groupScreen(screenName = (Manifest.VideoDetailScreen)) {
                     VideoDetailScreen()

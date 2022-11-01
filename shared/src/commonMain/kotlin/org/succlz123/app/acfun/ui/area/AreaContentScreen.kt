@@ -19,6 +19,7 @@ import org.succlz123.app.acfun.base.AcBackButton
 import org.succlz123.app.acfun.base.LoadingFailView
 import org.succlz123.app.acfun.base.LoadingView
 import org.succlz123.app.acfun.theme.ColorResource
+import org.succlz123.app.acfun.ui.main.GlobalFocusViewModel
 import org.succlz123.app.acfun.ui.main.tab.item.MainHomeContentItem
 import org.succlz123.lib.click.noRippleClickable
 import org.succlz123.lib.screen.LocalScreenNavigator
@@ -45,6 +46,13 @@ fun AreaContentScreen() {
     }
     LaunchedEffect(key1 = id) {
         viewModel.getData(id)
+    }
+
+    val focusVm = viewModel(GlobalFocusViewModel::class) {
+        GlobalFocusViewModel()
+    }
+    LaunchedEffect(Unit) {
+        focusVm.curFocusRequesterParent.value = viewModel.contentFocusParent
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -109,6 +117,10 @@ fun AreaContentScreen() {
                     } else {
                         MainHomeContentItem(result = ScreenResult.Success(acContentList),
                             isExpandedScreen = isExpandedScreen,
+
+                            thisRequester = viewModel.contentFocusParent,
+                            otherRequester = null,
+
                             onRefresh = {
                                 viewModel.getData(
                                     id,

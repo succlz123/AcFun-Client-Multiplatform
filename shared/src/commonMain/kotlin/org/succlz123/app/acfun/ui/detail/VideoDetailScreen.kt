@@ -13,6 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,11 +27,16 @@ import org.succlz123.app.acfun.base.AcBackButton
 import org.succlz123.app.acfun.base.LoadingFailView
 import org.succlz123.app.acfun.base.LoadingView
 import org.succlz123.app.acfun.theme.ColorResource
+import org.succlz123.app.acfun.ui.main.GlobalFocusViewModel
 import org.succlz123.lib.click.noRippleClickable
 import org.succlz123.lib.common.getPlatformName
 import org.succlz123.lib.filedownloader.core.DownloadRequest
 import org.succlz123.lib.filedownloader.core.DownloadStateType
 import org.succlz123.lib.filedownloader.core.FileDownLoader
+import org.succlz123.lib.focus.FocusNode
+import org.succlz123.lib.focus.notAllowMove
+import org.succlz123.lib.focus.onFocusKeyEventMove
+import org.succlz123.lib.focus.onFocusParent
 import org.succlz123.lib.image.AsyncImageUrlMultiPlatform
 import org.succlz123.lib.screen.LocalScreenNavigator
 import org.succlz123.lib.screen.LocalScreenRecord
@@ -54,6 +63,7 @@ fun VideoDetailScreen() {
     LaunchedEffect(Unit) {
         viewModel.getDetail(acContent)
     }
+
     Box(modifier = Modifier.fillMaxSize().background(Color.White).noRippleClickable {
         screenNavigation.cancelPopupWindow()
     }) {
@@ -74,7 +84,9 @@ fun VideoDetailScreen() {
             is ScreenResult.Success -> {
                 val vc = videoContent.invoke()
                 Box(contentAlignment = Alignment.Center) {
-                    videoDetailContent(acContent, vc, viewModel)
+                    videoDetailContent(
+                        acContent, vc, viewModel, viewModel.userSpaceFocusParent, viewModel.episodeFocusParent
+                    )
 
                     val showPlayerLoading = remember { mutableStateOf(false) }
                     if (showPlayerLoading.value) {
@@ -113,7 +125,13 @@ fun VideoDetailScreen() {
 }
 
 @Composable
-fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: VideoDetailViewModel) {
+fun videoDetailContent(
+    acContent: AcContent,
+    vContent: VideoContent,
+    viewModel: VideoDetailViewModel,
+    userSpaceFocusParent: FocusRequester,
+    episodeFocusParent: FocusRequester
+) {
     val screenNavigation = LocalScreenNavigator.current
     Column(modifier = Modifier.fillMaxSize().padding(24.dp, 48.dp, 24.dp, 48.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -131,18 +149,50 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                modifier = Modifier.noRippleClickable {
-                    screenNavigation.push(
-                        Manifest.UserSpaceScreen,
-                        screenKey = vContent.user?.id.orEmpty(),
-                        arguments = ScreenArgs.putValue("KEY_USER_NAME", vContent.user?.name)
-                            .putValue("KEY_USER_ID", vContent.user?.id),
-                        pushOptions = PushOptions(
-                            removePredicate = PushOptions.RemoveAnyPredicate(Manifest.UserSpaceScreen)
-                        )
+            val isFocused = remember { mutableStateOf(false) }
+            val userSpaceFocusNode = remember { FocusNode(tag = "UserSpace") }
+            SideEffect {
+                if (viewModel.currentFocusNode.value == userSpaceFocusNode) {
+                    userSpaceFocusParent.requestFocus()
+                }
+            }
+            Text(modifier = Modifier.onFocusParent(userSpaceFocusParent, "video detail - user space") {
+                isFocused.value = (it.isFocused)
+                if (it.isFocused) {
+                    viewModel.currentFocusNode.value = userSpaceFocusNode
+                }
+            }.onFocusKeyEventMove(leftCanMove = notAllowMove,
+                rightCanMove = notAllowMove,
+                upCanMove = notAllowMove,
+                downCanMove = {
+                    viewModel.currentFocusNode.value = FocusNode(tag = "Episode")
+                    episodeFocusParent.requestFocus()
+                    false
+                }).noRippleClickable {
+                screenNavigation.push(
+                    Manifest.UserSpaceScreen,
+                    screenKey = vContent.user?.id.orEmpty(),
+                    arguments = ScreenArgs.putValue("KEY_USER_NAME", vContent.user?.name)
+                        .putValue("KEY_USER_ID", vContent.user?.id),
+                    pushOptions = PushOptions(
+                        removePredicate = PushOptions.RemoveAnyPredicate(Manifest.UserSpaceScreen)
                     )
-                }, text = vContent.user?.name.orEmpty(), fontSize = 20.sp, color = ColorResource.acRed
+                )
+                userSpaceFocusParent.requestFocus()
+            }.background(
+                if (isFocused.value) {
+                    ColorResource.acRed
+                } else {
+                    Color.Transparent
+                }, shape = RoundedCornerShape(6.dp)
+            ).padding(12.dp, 6.dp),
+                text = vContent.user?.name.orEmpty(),
+                fontSize = 20.sp,
+                color = if (isFocused.value) {
+                    Color.White
+                } else {
+                    ColorResource.acRed
+                }
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
@@ -216,28 +266,77 @@ fun videoDetailContent(acContent: AcContent, vContent: VideoContent, viewModel: 
         }
         val isExpandedScreen = rememberIsWindowExpanded()
 
+        val focusVm = viewModel(GlobalFocusViewModel::class) {
+            GlobalFocusViewModel()
+        }
+        LaunchedEffect(Unit) {
+            if (focusVm.curFocusRequesterParent.value == null) {
+                viewModel.episodeFocusParent.requestFocus()
+            }
+        }
+
+        val grid = remember {
+            if (isExpandedScreen) {
+                6
+            } else {
+                2
+            }
+        }
         LazyVerticalGrid(
-            columns = GridCells.Fixed(
-                if (isExpandedScreen) {
-                    6
-                } else {
-                    2
-                }
-            ),
-            modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Fixed(grid),
+            modifier = Modifier.fillMaxSize().onFocusParent(episodeFocusParent, "video detail - episode")
+                .onFocusKeyEventMove(upCanMove = {
+                    if (viewModel.currentFocusNode.value.index < grid) {
+                        viewModel.currentFocusNode.value = FocusNode(tag = "UserSpace")
+                        userSpaceFocusParent.requestFocus()
+                    }
+                    true
+                }),
             contentPadding = PaddingValues(top = 12.dp, bottom = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             itemsIndexed(vContent.videoList.orEmpty()) { index, item ->
+
+                val focusRequester = remember { FocusRequester() }
+                val episodeFocusNode = remember { FocusNode(tag = "Episode", index = index) }
+
+                val curParentFocused = focusVm.curFocusRequesterParent.collectAsState()
+                if (curParentFocused.value == episodeFocusParent && (viewModel.currentFocusNode.value == episodeFocusNode)) {
+                    SideEffect {
+                        focusRequester.requestFocus()
+                    }
+                }
+
+                val isFocused = viewModel.currentFocusNode.collectAsState().value == episodeFocusNode
+
                 Box(
-                    modifier = Modifier.weight(1f).height(52.dp).clip(MaterialTheme.shapes.medium)
-                        .background(ColorResource.background)
+                    modifier = Modifier.weight(1f).height(52.dp).clip(MaterialTheme.shapes.medium).background(
+                        if (isFocused) {
+                            ColorResource.acRed
+                        } else {
+                            ColorResource.background
+                        }
+                    )
                 ) {
-                    Box(modifier = Modifier.align(Alignment.Center).noRippleClickable {
-                        viewModel.play(acContent, index + 1)
-                    }, contentAlignment = Alignment.Center) {
-                        Text(text = (index + 1).toString(), style = MaterialTheme.typography.h3)
+                    Box(modifier = Modifier.align(Alignment.Center).fillMaxSize().padding(0.dp, 0.dp, 32.dp, 0.dp)
+                        .focusRequester(focusRequester).onFocusChanged {
+                            if (it.isFocused) {
+                                viewModel.currentFocusNode.value = FocusNode(tag = "Episode", index = index)
+                            }
+                        }.focusTarget().noRippleClickable {
+                            viewModel.play(acContent, index + 1)
+                        }, contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = (index + 1).toString(),
+                            style = MaterialTheme.typography.h3,
+                            color = if (isFocused) {
+                                ColorResource.white
+                            } else {
+                                ColorResource.black
+                            }
+                        )
                     }
                     PopupWindowLayout(modifier = Modifier.align(Alignment.CenterEnd), displayContent = {
                         Card(
