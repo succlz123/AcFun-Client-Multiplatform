@@ -36,6 +36,7 @@ compose.desktop {
                 iconFile.set(project.file("ic_acfun.icns"))
             }
             windows {
+                menuGroup = "AcFun"
                 iconFile.set(project.file("ic_acfun.ico"))
             }
             linux {
